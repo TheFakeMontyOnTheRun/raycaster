@@ -118,7 +118,7 @@ namespace odb {
         for (Sint16 d = -22; d < 22; ++d) {
 
             float ray = castRay(game, d);
-            float distance = ray * 240.0f / 12.0f;
+            float distance = 2.0f * ray * 240.0f / 12.0f;
 
             rect = SDL_Rect{static_cast<Sint16 >(column),
                             static_cast<Sint16 >(240.0f - (distance / 2.0f)),
