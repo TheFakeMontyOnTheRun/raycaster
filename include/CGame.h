@@ -14,7 +14,7 @@ namespace odb {
       explicit CGame();
       long timeEllapsed = 0;
 
-        std::array<std::array< int, 12>, 12 > map;
+        std::array<std::array< int, 40>, 40 > map;
 
         void tick( long ms );
         CControlCallback getKeyPressedCallback();

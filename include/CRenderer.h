@@ -15,6 +15,8 @@ namespace odb {
         void sleep( long ms );
 
         float castRay(const CGame &angle, short offset);
+
+        int wrap360(int i);
     };
 }
 #endif

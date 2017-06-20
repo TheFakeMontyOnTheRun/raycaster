@@ -10,6 +10,22 @@
 #include <cmath>
 
 namespace odb {
+    float Q_rsqrt( float number )
+    {
+        long i;
+        float x2, y;
+        const float threehalfs = 1.5F;
+
+        x2 = number * 0.5F;
+        y  = number;
+        i  = * ( long * ) &y;                       // evil floating point bit level hacking
+        i  = 0x5f3759df - ( i >> 1 );               // what the fuck?
+        y  = * ( float * ) &i;
+        y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+
+        return y;
+    }
 
     int sines[ 360 ];
     int cossines[ 360 ];
@@ -112,23 +128,41 @@ namespace odb {
       
     case CGame::EGameState::kGame: {
 
-        constexpr auto columnsPerDegree = 640 / 45;
+        constexpr auto columnsPerDegree = 640 / 90;
         Sint16 column = 0;
-
-        for (Sint16 d = -22; d < 22; ++d) {
+        std::cout << "BEGIN" << std::endl;
+        for (Sint16 d = -45; d < 45; ++d) {
 
             float ray = castRay(game, d);
-            int distance = 2 * ray * 240 / 12;
+            int distance = 2 * (40 * Q_rsqrt(ray)) * 240 / 40;
+            ray = sqrt( ray );
+            float sin_a = sin( wrap360( game.angle + d) * ( 3.14159f / 180.0f) );
+            float hue = game.x + ( ray * ( sin_a ) );
 
-            rect = SDL_Rect{static_cast<Sint16 >(column),
-                            static_cast<Sint16 >(240 - (distance / 2)),
-                            static_cast<Uint16 >(columnsPerDegree),
-                            static_cast<Uint16 >(distance)};
+            int cell = hue;
 
-            SDL_FillRect(video, &rect, SDL_MapRGB(video->format, std::min<int>( 255, 16 + distance), 0, 0));
+            int dx = ( hue - cell ) * 16;
+
+
+
+            std::cout << "x " << game.x << ", y " << game.y << " angle " << wrap360( game.angle + d ) << " sin " <<  sin_a << " distance " << ray << " cell " << cell << std::endl;
+
+
+
+            for ( int y = 0; y < distance; ++y ) {
+                rect = SDL_Rect{static_cast<Sint16 >(column),
+                                static_cast<Sint16 >(240 - (distance / 2) + y ),
+                                static_cast<Uint16 >(columnsPerDegree),
+                                static_cast<Uint16 >(1)};
+
+                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, std::min<int>( 255, 128 ), y, 255 * dx / 40 ));
+            }
+
+
 
             column += columnsPerDegree;
         }
+        std::cout << "END" << std::endl;
     }
       break;
 
@@ -153,9 +187,10 @@ namespace odb {
     SDL_Flip(video);
   }
 
+
     float CRenderer::castRay( const CGame &game, short offset) {
 
-        const auto limit = 12 *0xFFFF;
+        const auto limit = 40 *0xFFFF;
 
         float rx0 = game.x * 0xFFFF;
         float ry0 = game.y * 0xFFFF;
@@ -163,11 +198,7 @@ namespace odb {
         float rx = rx0;
         float ry = ry0;
 
-        int angle = static_cast<int>( game.angle + offset) % 360;
-
-        while ( angle < 0 ) {
-            angle += 360;
-        }
+        int angle = wrap360( game.angle + offset);
 
         do {
             rx += sines[ angle ];
@@ -181,8 +212,16 @@ namespace odb {
         dx = dx / 0xFFFF;
         dy = dy / 0xFFFF;
 
-        float distance = (( dx * dx ) + ( dy * dy ));
+        return (( dx * dx ) + ( dy * dy ));
+    }
 
-        return 144.0f / std::max( 1.0f, distance );
+    int CRenderer::wrap360(int i) {
+        int angle = static_cast<int>( i ) % 360;
+
+        while ( angle < 0 ) {
+            angle += 360;
+        }
+
+        return angle;
     }
 }
