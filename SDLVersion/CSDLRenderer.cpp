@@ -11,6 +11,9 @@
 
 namespace odb {
 
+    float sines[ 360 ];
+    float cossines[ 360 ];
+
     SDL_Surface *video;
 
     CRenderer::CRenderer( CControlCallback keyPressedCallback, CControlCallback keyReleasedCallback ):
@@ -18,6 +21,13 @@ namespace odb {
     {
         SDL_Init( SDL_INIT_EVERYTHING );
         video = SDL_SetVideoMode( 640, 480, 0, 0 );
+
+        for ( int c = 0; c < 360; ++c ) {
+            float sin_a = std::sin(((c) * 3.14159f) / 180.0f) / 10.0f;
+            float cos_a = std::cos(((c) * 3.14159f) / 180.0f) / 10.0f;
+            sines[ c ] = sin_a;
+            cossines[ c ] = cos_a;
+        }
     }
 
     void CRenderer::sleep( long ms ) {
@@ -154,13 +164,9 @@ namespace odb {
             angle += 360;
         }
 
-
-        float sin_a = std::sin(((angle) * 3.14159f) / 180.0f) / 1000.0f;
-        float cos_a = std::cos(((angle) * 3.14159f) / 180.0f) / 1000.0f;
-
         do {
-            rx += sin_a;
-            ry += cos_a;
+            rx += sines[ angle ];
+            ry += cossines[ angle ];
         } while ( ( rx > 0 && rx < 12 && ry > 0 && ry < 12 ) && ( game.map[ ry ][ rx ] == 0 ));
 
 
