@@ -115,7 +115,7 @@ namespace odb {
         constexpr auto columnsPerDegree = 640.0f / 45.0f;
         Sint16 column = 0;
 
-        for (Sint16 d = -32; d < 32; ++d) {
+        for (Sint16 d = -22; d < 22; ++d) {
 
             float ray = castRay(game, d);
             float distance = ray * 240.0f / 12.0f;
