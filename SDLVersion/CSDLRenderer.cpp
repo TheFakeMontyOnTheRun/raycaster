@@ -11,8 +11,8 @@
 
 namespace odb {
 
-    float sines[ 360 ];
-    float cossines[ 360 ];
+    int sines[ 360 ];
+    int cossines[ 360 ];
 
     SDL_Surface *video;
 
@@ -23,8 +23,8 @@ namespace odb {
         video = SDL_SetVideoMode( 640, 480, 0, 0 );
 
         for ( int c = 0; c < 360; ++c ) {
-            float sin_a = std::sin(((c) * 3.14159f) / 180.0f) / 10.0f;
-            float cos_a = std::cos(((c) * 3.14159f) / 180.0f) / 10.0f;
+            auto sin_a = (std::sin(((c) * 3.14159f) / 180.0f) * static_cast<float>(0xFFFF) / 128.0f);
+            auto cos_a = (std::cos(((c) * 3.14159f) / 180.0f) * static_cast<float>(0xFFFF) / 128.0f);
             sines[ c ] = sin_a;
             cossines[ c ] = cos_a;
         }
@@ -112,16 +112,16 @@ namespace odb {
       
     case CGame::EGameState::kGame: {
 
-        constexpr auto columnsPerDegree = 640.0f / 45.0f;
+        constexpr auto columnsPerDegree = 640 / 45;
         Sint16 column = 0;
 
         for (Sint16 d = -22; d < 22; ++d) {
 
             float ray = castRay(game, d);
-            float distance = 2.0f * ray * 240.0f / 12.0f;
+            int distance = 2 * ray * 240 / 12;
 
             rect = SDL_Rect{static_cast<Sint16 >(column),
-                            static_cast<Sint16 >(240.0f - (distance / 2.0f)),
+                            static_cast<Sint16 >(240 - (distance / 2)),
                             static_cast<Uint16 >(columnsPerDegree),
                             static_cast<Uint16 >(distance)};
 
@@ -155,8 +155,13 @@ namespace odb {
 
     float CRenderer::castRay( const CGame &game, short offset) {
 
-        float rx = game.x;
-        float ry = game.y;
+        const auto limit = 12 *0xFFFF;
+
+        float rx0 = game.x * 0xFFFF;
+        float ry0 = game.y * 0xFFFF;
+
+        float rx = rx0;
+        float ry = ry0;
 
         int angle = static_cast<int>( game.angle + offset) % 360;
 
@@ -167,13 +172,17 @@ namespace odb {
         do {
             rx += sines[ angle ];
             ry += cossines[ angle ];
-        } while ( ( rx > 0 && rx < 12 && ry > 0 && ry < 12 ) && ( game.map[ ry ][ rx ] == 0 ));
+        } while ( ( rx > 0 && rx < limit && ry > 0 && ry < limit ) && ( game.map[ ry /0xFFFF][ rx/0xFFFF ] == 0 ));
 
 
-        float dx = rx - game.x;
-        float dy = ry - game.y;
-        float distance = sqrt(( dx * dx ) + ( dy * dy ));
+        float dx = rx - rx0;
+        float dy = ry - ry0;
 
-        return 12.0f / std::max( 0.1f, distance );
+        dx = dx / 0xFFFF;
+        dy = dy / 0xFFFF;
+
+        float distance = (( dx * dx ) + ( dy * dy ));
+
+        return 144.0f / std::max( 1.0f, distance );
     }
 }
