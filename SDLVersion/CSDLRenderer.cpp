@@ -6,10 +6,17 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_mixer.h>
 
+#include <memory>
 #include <iostream>
 #include <cmath>
-
+#include <vector>
+#include "NativeBitmap.h"
+#include "IFileLoaderDelegate.h"
+#include "CPlainFileLoader.h"
+#include "LoadPNG.h"
 namespace odb {
+    auto texture = loadPNG("tile0.png", std::make_shared<Knights::CPlainFileLoader>(""));
+
     float Q_rsqrt( float number )
     {
         long i;
@@ -141,7 +148,7 @@ namespace odb {
 
             int cell = hue;
 
-            int dx = ( hue - cell ) * 16;
+            int dx = ( hue - cell ) * 32;
 
 
 
@@ -151,12 +158,17 @@ namespace odb {
             int columnHeight = distance;
 
             for ( int y = 0; y < columnHeight; ++y ) {
+
+                int v = ( texture->getHeight() * y) / columnHeight;
+                int u = (texture->getWidth() * dx) / 40;
+                int pixel = texture->getPixelData()[ ( texture->getWidth() * v ) + u ];
+
                 rect = SDL_Rect{static_cast<Sint16 >(column),
                                 static_cast<Sint16 >(240 - (distance / 2) + y ),
                                 static_cast<Uint16 >(columnsPerDegree),
                                 static_cast<Uint16 >(1)};
 
-                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, (255 * y) / columnHeight, 0, 255 * dx / 40 ));
+                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, pixel & 0xFF000000, pixel & 0x00FF0000, pixel & 0x0000FF ) );
             }
 
 
