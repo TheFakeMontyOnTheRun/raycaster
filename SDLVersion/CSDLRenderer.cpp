@@ -148,14 +148,15 @@ namespace odb {
             std::cout << "x " << game.x << ", y " << game.y << " angle " << wrap360( game.angle + d ) << " sin " <<  sin_a << " distance " << ray << " cell " << cell << std::endl;
 
 
+            int columnHeight = distance;
 
-            for ( int y = 0; y < distance; ++y ) {
+            for ( int y = 0; y < columnHeight; ++y ) {
                 rect = SDL_Rect{static_cast<Sint16 >(column),
                                 static_cast<Sint16 >(240 - (distance / 2) + y ),
                                 static_cast<Uint16 >(columnsPerDegree),
                                 static_cast<Uint16 >(1)};
 
-                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, std::min<int>( 255, 128 ), y, 255 * dx / 40 ));
+                SDL_FillRect(video, &rect, SDL_MapRGB(video->format, (255 * y) / columnHeight, 0, 255 * dx / 40 ));
             }
 
 
