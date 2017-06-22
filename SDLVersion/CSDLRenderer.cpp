@@ -135,6 +135,7 @@ namespace odb {
       
     case CGame::EGameState::kGame: {
 
+
         constexpr auto columnsPerDegree = 640 / 90;
         Sint16 column = 0;
         std::cout << "BEGIN" << std::endl;
@@ -144,24 +145,24 @@ namespace odb {
             int distance = 2 * (40 * Q_rsqrt(ray)) * 240 / 40;
             ray = sqrt( ray );
             float sin_a = sin( wrap360( game.angle + d) * ( 3.14159f / 180.0f) );
-            float hue = game.x + ( ray * ( sin_a ) );
+            float cos_a = cos( wrap360( game.angle + d) * ( 3.14159f / 180.0f) );
+            float hueX = game.x + ( ray * ( sin_a ) );
+            float hueZ = game.y + ( ray * ( cos_a ) );
 
-            int cell = hue;
+            int cellX = hueX;
+            int cellZ = hueZ;
 
-            int dx = ( hue - cell ) * 32;
-
-
-
-            std::cout << "x " << game.x << ", y " << game.y << " angle " << wrap360( game.angle + d ) << " sin " <<  sin_a << " distance " << ray << " cell " << cell << std::endl;
-
+            int dx = ( hueX - cellX ) * 32;
+            int dz = ( hueZ - cellZ ) * 32;
 
             int columnHeight = distance;
 
             for ( int y = 0; y < columnHeight; ++y ) {
 
                 int v = ( texture->getHeight() * y) / columnHeight;
-                int u = (texture->getWidth() * dx) / 40;
-                int pixel = texture->getPixelData()[ ( texture->getWidth() * v ) + u ];
+                int ux = (texture->getWidth() * dx) / 40;
+                int uz = (texture->getWidth() * dz) / 40;
+                int pixel = texture->getPixelData()[ ( texture->getWidth() * v ) + ((ux + uz ) % texture->getWidth()) ];
 
                 rect = SDL_Rect{static_cast<Sint16 >(column),
                                 static_cast<Sint16 >(240 - (distance / 2) + y ),
