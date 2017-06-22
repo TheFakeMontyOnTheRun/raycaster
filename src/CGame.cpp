@@ -131,12 +131,12 @@ namespace odb {
             }
 
             if (command == ECommand::kUp) {
-                x += std::sin((angle * 3.14159f) / 180.0f);
-                y += std::cos((angle * 3.14159f) / 180.0f);
+                x += std::sin((angle * 3.14159f) / 180.0f) * 0.75f;
+                y += std::cos((angle * 3.14159f) / 180.0f) * 0.75f;
 
             } else if (command == ECommand::kDown) {
-                x -= std::sin((angle * 3.14159f) / 180.0f);
-                y -= std::cos((angle * 3.14159f) / 180.0f);
+                x -= std::sin((angle * 3.14159f) / 180.0f) * 0.75f;
+                y -= std::cos((angle * 3.14159f) / 180.0f) * 0.75f;
 
             }
         };
