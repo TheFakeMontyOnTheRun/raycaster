@@ -15,6 +15,9 @@
 #include "CPlainFileLoader.h"
 #include "LoadPNG.h"
 namespace odb {
+    const int xRes = 800;
+    const int yRes = 600;
+
     auto texture = loadPNG("tile0.png", std::make_shared<Knights::CPlainFileLoader>(""));
 
     float Q_rsqrt( float number )
@@ -43,7 +46,7 @@ namespace odb {
     mOnKeyPressedCallback( keyPressedCallback ), mOnKeyReleasedCallback( keyReleasedCallback )
     {
         SDL_Init( SDL_INIT_EVERYTHING );
-        video = SDL_SetVideoMode( 640, 480, 0, 0 );
+        video = SDL_SetVideoMode( xRes, yRes, 0, 0 );
 
         for ( int c = 0; c < 360; ++c ) {
             auto sin_a = (std::sin(((c) * 3.14159f) / 180.0f) * static_cast<float>(0xFFFF) / 128.0f);
@@ -121,7 +124,7 @@ namespace odb {
   void CRenderer::render( const CGame& game, long ms ) {
 
     SDL_Rect rect;
-    rect = { 0, 0, 640, 480 };
+    rect = { 0, 0, xRes, yRes };
     const int px = game.x;
     const int py = game.y;
     
@@ -129,20 +132,20 @@ namespace odb {
     
     switch ( game.gameState ) {
     case CGame::EGameState::kTitleScreen:
-      rect = { 320, 240, 640, 480 };
+      rect = { xRes / 2, yRes / 2, xRes, yRes };
       SDL_FillRect( video, &rect, SDL_MapRGB( video->format, 0, 255, 0 ) );
       break;
       
     case CGame::EGameState::kGame: {
 
 
-        constexpr auto columnsPerDegree = 640 / 90;
+        constexpr auto columnsPerDegree = xRes / 90;
         Sint16 column = 0;
         std::cout << "BEGIN" << std::endl;
         for (Sint16 d = -45; d < 45; ++d) {
 
             float ray = castRay(game, d);
-            int distance = 2 * (40 * Q_rsqrt(ray)) * 240 / 40;
+            int distance = 2 * (40 * Q_rsqrt(ray)) * yRes / 2 / 40;
             ray = sqrt( ray );
             float sin_a = sin( wrap360( game.angle + d) * ( 3.14159f / 180.0f) );
             float cos_a = cos( wrap360( game.angle + d) * ( 3.14159f / 180.0f) );
@@ -165,7 +168,7 @@ namespace odb {
                 int pixel = texture->getPixelData()[ ( texture->getWidth() * v ) + ((ux + uz ) % texture->getWidth()) ];
 
                 rect = SDL_Rect{static_cast<Sint16 >(column),
-                                static_cast<Sint16 >(240 - (distance / 2) + y ),
+                                static_cast<Sint16 >(yRes / 2 - (distance / 2) + y ),
                                 static_cast<Uint16 >(columnsPerDegree),
                                 static_cast<Uint16 >(1)};
 
@@ -184,13 +187,13 @@ namespace odb {
       rect = SDL_Rect{ 0,0,0,0 };
       rect.x = game.x;
       rect.y = game.y;
-      rect.w = 640 - game.x;
+      rect.w = xRes - game.x;
       rect.h = game.y;
       SDL_FillRect( video, &rect, SDL_MapRGB( video->format, 255, 255, 0 ) );
       break;
       
     case CGame::EGameState::kGameOver:
-      rect = SDL_Rect{ 0,0, 640, 480 };
+      rect = SDL_Rect{ 0,0, xRes, yRes };
       SDL_FillRect( video, &rect, SDL_MapRGB( video->format, 255, 0, 0 ) );
       break;
       
