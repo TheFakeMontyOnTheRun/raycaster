@@ -121,7 +121,48 @@ namespace odb {
         }
 }
 
-  void CRenderer::render( const CGame& game, long ms ) {
+    inline void Set(int x, int y, SDL_Surface* surface, Uint32 color) {
+        auto rect = SDL_Rect{
+                        static_cast<Sint16 >(x),
+                        static_cast<Sint16 >(y),
+                        static_cast<Uint16 >(1),
+                        static_cast<Uint16 >(1)};
+
+        SDL_FillRect(video, &rect, color );
+    }
+
+    inline Uint32 Get(int x, int y, std::shared_ptr<NativeBitmap> texture) {
+        Uint32 *ptr = (Uint32 *) texture->getPixelData();
+        ptr += texture->getWidth() * y;
+        ptr += x;
+        return *ptr;
+    }
+
+    void MapToSphere(SDL_Surface *dst, int x0, int y0, int x1, int y1, std::shared_ptr<NativeBitmap> texture, int step ) {
+        float _cos;
+        float _sin;
+        int u;
+        int v;
+
+        float rad = 3.14159257f / 180.0f;
+
+        for (int d = 90; d < 270; d++ ) {
+            for (int c = 0; c < 180; c++) {
+
+                _sin = sin( c * rad) * sin( d * rad) * 180;
+                _cos = cos( c * rad ) * 180;
+
+                u = (step + d) % texture->getWidth();
+                v = (180 - c) % texture->getHeight();
+
+                auto texel = Get(u, v, texture);
+                Set(320 + _sin, 200 + _cos, dst, texel );
+            }
+        }
+    }
+
+
+    void CRenderer::render( const CGame& game, long ms ) {
 
     SDL_Rect rect;
     rect = { 0, 0, xRes, yRes };
@@ -159,6 +200,8 @@ namespace odb {
             int dz = ( hueZ - cellZ ) * 32;
 
             int columnHeight = distance;
+
+            MapToSphere(video, 0, 0, 100, 400, texture, 1 );
 
             for ( int y = 0; y < columnHeight; ++y ) {
 
