@@ -157,7 +157,7 @@ namespace odb {
 
                 auto texel = Get(u, v, texture);
                 Set(320 + _sin, 200 + _cos, dst, texel );
-            }
+             }
         }
     }
 
@@ -165,12 +165,16 @@ namespace odb {
     void CRenderer::render( const CGame& game, long ms ) {
 
     SDL_Rect rect;
-    rect = { 0, 0, xRes, yRes };
+
     const int px = game.x;
     const int py = game.y;
-    
-    SDL_FillRect( video, &rect, SDL_MapRGB( video->format, 0, 0, 0 ) );
-    
+
+    rect = { 0, 0, xRes, yRes };
+    SDL_FillRect( video, &rect, SDL_MapRGB( video->format, 96, 96, 96 ) );
+
+    rect = { 0, yRes / 2, xRes, yRes / 2};
+    SDL_FillRect( video, &rect, SDL_MapRGB( video->format, 192, 192, 192 ) );
+
     switch ( game.gameState ) {
     case CGame::EGameState::kTitleScreen:
       rect = { xRes / 2, yRes / 2, xRes, yRes };
