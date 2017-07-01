@@ -201,8 +201,6 @@ namespace odb {
 
             int columnHeight = distance;
 
-            MapToSphere(video, 0, 0, 100, 400, texture, 1 );
-
             for ( int y = 0; y < columnHeight; ++y ) {
 
                 int v = ( texture->getHeight() * y) / columnHeight;
