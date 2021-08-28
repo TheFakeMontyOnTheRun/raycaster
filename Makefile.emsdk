@@ -1,7 +1,7 @@
 CXX = em++
-CXXFLAGS = -g  --preload-file res --use-preload-plugins -Iinclude -std=c++1y
+CXXFLAGS = -g  --preload-file res --use-preload-plugins -Iinclude -std=c++1y -Iinclude -Inoudar-core/noudar-core/include -Istb
 
-OBJS = src/CGame.o SDLVersion/CSDLRenderer.o SDLVersion/main.o
+OBJS = src/CGame.o  SDLVersion/main.o SDLVersion/CSDLRenderer.o src/NativeBitmap.o src/LoadPNG.o noudar-core/noudar-core/src/CPlainFileLoader.o noudar-core/noudar-core/src/Common.o 
 
 
 TARGET = game.html

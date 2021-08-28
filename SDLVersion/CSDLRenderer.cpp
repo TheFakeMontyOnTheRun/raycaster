@@ -1,3 +1,4 @@
+#include <array>
 #include <functional>
 #include "Common.h"
 
@@ -18,7 +19,7 @@ namespace odb {
     const int xRes = 800;
     const int yRes = 600;
 
-    auto texture = loadPNG("tile0.png", std::make_shared<Knights::CPlainFileLoader>(""));
+    auto texture = loadPNG("res/tile0.png", std::make_shared<Knights::CPlainFileLoader>(""));
 
     float Q_rsqrt( float number )
     {
